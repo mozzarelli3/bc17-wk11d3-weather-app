@@ -2,10 +2,9 @@ import { useState } from 'react'
 import './App.css'
 
 function App() {
-  const [city, setCity] = useState("");
+  // const [city, setCity] = useState("");
+  let city: string;
   const [weather, setWeather] = useState<WeatherData | null>(null);
-
-  ///////////////////
 
   const apiKey = "5f792d861bf1ccd73e46a86bd55c3e0b";
   const baseURL = "https://api.openweathermap.org/data/2.5/weather";
@@ -46,11 +45,12 @@ function App() {
     }
   }
 
-  ///////////////////////
-
   const handleChangeEvent = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCity(event.target.value);
+    city = event.target.value;
+    // setCity(event.target.value);
   };
+
+  
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); //prevent reload
@@ -72,7 +72,7 @@ function App() {
         ></input>
         <button type="submit">Search</button>
       </form>
-      
+
       {/* Conditional rendering to check if weather is not null */}
       {weather ? (
         <div>
