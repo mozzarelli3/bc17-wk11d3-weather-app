@@ -1,33 +1,75 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [city, setCity] = useState("")
+  const [weather, setWeather] = useState({})
+
+  ///////////////////
+
+  const apiKey = '5f792d861bf1ccd73e46a86bd55c3e0b';
+  const baseURL = 'https://api.openweathermap.org/data/2.5/weather';
+
+  interface WeatherData {
+      name: string;
+      main: {
+          temp: number;
+          feels_like: number;
+          temp_min: number;
+          temp_max: number;
+          humidity: number;
+      };
+      weather: { description: string }[];
+  }
+
+  async function getWeather(city: string): Promise<void> {
+      try {
+          const response = await fetch(`${baseURL}?q=${city}&appid=${apiKey}&units=metric`);
+
+          // Check if the request was successful
+          if (!response.ok) {
+              throw new Error(`Error: ${response.statusText}`);
+          }
+
+          const data: WeatherData = await response.json();
+          setWeather(data)
+
+          console.log(`Weather in ${data.name}:`);
+          console.log(`Temperature: ${data.main.temp}°C`);
+          console.log(`Feels like: ${data.main.feels_like}°C`);
+          console.log(`Humidity: ${data.main.humidity}%`);
+          console.log(`Description: ${data.weather[0].description}`);
+      } catch (error) {
+          console.error(`Error fetching weather data: ${error}`);
+      }
+  }
+
+  ///////////////////////
+
+  const handleChangeEvent = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCity(event.target.value)
+  }
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault(); //prevent reload
+      
+      getWeather(city);
+  }
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <h1>WeatherStation</h1>
+      <form onSubmit={handleSubmit}>
+        <input
+        type="text"
+        name="City"
+        value={city}
+        onChange={(event) => {             
+              handleChangeEvent(event)
+        }}
+        ></input>
+        <button type="submit">Search</button>
+      </form>
     </>
   )
 }
