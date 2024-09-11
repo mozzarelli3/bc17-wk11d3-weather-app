@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import './App.css'
 
 function App() {
-  // const [city, setCity] = useState("");
-  let city: string;
+  // Manage input value using uncontrolled component using a ref
+  const cityRef = useRef<HTMLInputElement>(null);
   const [weather, setWeather] = useState<WeatherData | null>(null);
 
   const apiKey = "5f792d861bf1ccd73e46a86bd55c3e0b";
@@ -21,6 +21,7 @@ function App() {
     weather: { description: string }[];
   }
 
+  // function performs asynchronous operations and does not return a value, its return type is Promise<void>
   async function getWeather(city: string): Promise<void> {
     try {
       const response = await fetch(
@@ -45,18 +46,14 @@ function App() {
     }
   }
 
-  const handleChangeEvent = (event: React.ChangeEvent<HTMLInputElement>) => {
-    city = event.target.value;
-    // setCity(event.target.value);
-  };
-
-  
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); //prevent reload
 
-    getWeather(city);
-  };
+    const city = cityRef.current?.value;
+    if (city) {
+      getWeather(city);
+    };
+  }
 
   return (
     <>
@@ -65,10 +62,7 @@ function App() {
         <input
           type="text"
           name="City"
-          value={city}
-          onChange={(event) => {
-            handleChangeEvent(event);
-          }}
+          ref={cityRef}
         ></input>
         <button type="submit">Search</button>
       </form>
